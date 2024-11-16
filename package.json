@@ -1,6 +1,6 @@
 {
   "name": "@daevm/ethsign-sp-sdk",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "",
   "source": "src/index.ts",
   "main": "build/esm/index.js",

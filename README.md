@@ -98,6 +98,52 @@ const getAttestationRes = await client.getAttestation("0x3", {
 }) // specify gated to decrypt attestation
 ```
 
-### Developer Feedback
+### Instructions
 
-A detailed feedback can be found [here](https://github.com/EthSign/ethglobal-bangkok-2024-tracker/issues/4)
+Follow the steps below to clone the repository, set up the environment, and run the demo:
+
+#### Clone the Repository
+
+1. Clone the repository to your local machine using the following command:
+
+   ```bash
+   git clone https://github.com/DaevMithran/SignxLit.git
+   ```
+
+2. Navigate to the Demo Directory
+
+   ```bash
+   cd demo
+   ```
+
+3. Install Dependencies
+
+   ```bash
+   npm i --save
+   ```
+
+4. Add a Private Key
+
+- Create a .env file in the demo directory.
+- Add a 32-seed private key in the .env file as follows:
+
+  ```bash
+  PRIVATE_KEY=<your-32-seed-private-key>
+  ```
+
+5. Build the Project
+
+   ```bash
+   npm run build
+   ```
+
+6. Start the Demo
+
+   ```bash
+   npm start
+   ```
+
+### Links
+
+- Developer Feedback: A detailed feedback can be found [here](https://github.com/EthSign/ethglobal-bangkok-2024-tracker/issues/4)
+- [Demo Video](https://www.youtube.com/watch?v=G3WXEwannUU)

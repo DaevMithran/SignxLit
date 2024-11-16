@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@daevm/ethsign-sp-sdk": "^0.8.4",
+    "@daevm/ethsign-sp-sdk": "^0.8.5",
     "chalk": "^5.3.0",
     "figlet": "^1.8.0",
     "inquirer": "^12.1.0",
