@@ -170,7 +170,7 @@ export class OnChainClient implements SignProtocolClientBase {
         chain: this.chain,
       }
       const { request } = await this.publicClient.simulateContract(data)
-      return this.walletClient.writeContract(request)
+      return this.walletClient.writeContract(request as any)
     } catch (error: any) {
       console.error(error.message)
       throw error
