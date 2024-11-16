@@ -1,19 +1,22 @@
 {
-    "compilerOptions": {
-        "target": "ES2020",
-        "module": "es6",
-        "moduleResolution": "node",
-        "declaration": true,
-        "outDir": "dist",
-        "strict": true,
-        "esModuleInterop": true,
-        "resolveJsonModule": true
-    },
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "compilerOptions": {
+    "strict": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "declarationMap": true,
+    "declaration": true,
+    "composite": true,
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "resolveJsonModule": true,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "include": ["src/**/*", "src/**/**/**/*.json"]
 }

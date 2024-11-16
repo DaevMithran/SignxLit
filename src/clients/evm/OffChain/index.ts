@@ -1,5 +1,5 @@
-import { ChainType, OffChainClientOptions, SignType } from "../../../types"
-import { OffChainClientBase } from "../../../interface/OffChainClientBase"
+import { ChainType, SignType } from "../../../types/index.js"
+import { OffChainClientBase } from "../../../interface/OffChainClientBase.js"
 import {
   PrivateKeyAccount,
   PublicClient,
@@ -10,7 +10,7 @@ import {
   custom,
 } from "viem"
 import { mainnet } from "viem/chains"
-import { OffChainRpc } from "../../../types/offChain"
+import { OffChainRpc } from "../../../types/offChain.js"
 
 export class OffChainClient extends OffChainClientBase {
   rpc: OffChainRpc | string

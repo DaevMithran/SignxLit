@@ -1,6 +1,6 @@
-import { getClient } from "./clients"
+import { getClient } from "./clients/index.js"
 
-import { SignProtocolClientBase } from "./interface/SignProtocolClientBase"
+import { SignProtocolClientBase } from "./interface/SignProtocolClientBase.js"
 import {
   Attestation,
   AttestationResult,
@@ -12,7 +12,8 @@ import {
   SchemaResult,
   CreateAttestationOnChainOptions,
   RevokeAttestationOnChainOptions,
-} from "./types"
+  GetAttestationChainOptions,
+} from "./types/index.js"
 export class SignProtocolClient implements SignProtocolClientBase {
   public client: SignProtocolClientBase
 
@@ -53,8 +54,11 @@ export class SignProtocolClient implements SignProtocolClientBase {
   ): Promise<AttestationResult> {
     return this.client.createAttestation(attestation, options)
   }
-  async getAttestation(attestationId: string): Promise<Attestation> {
-    return this.client.getAttestation(attestationId)
+  async getAttestation(
+    attestationId: string,
+    options?: GetAttestationChainOptions
+  ): Promise<Attestation> {
+    return this.client.getAttestation(attestationId, options)
   }
 
   async revokeAttestation(

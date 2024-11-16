@@ -13,21 +13,21 @@ import {
   LitAbility,
   UnifiedAccessControlConditions,
 } from "@lit-protocol/types"
-import {
-  uint8arrayFromString,
-  uint8arrayToString,
-} from "@lit-protocol/uint8arrays"
+import { uint8arrayToString } from "@lit-protocol/uint8arrays"
 import { ethers } from "ethers"
 
 export class LitProtocol {
   client: LitNodeClient | LitNodeClientNodeJs
   litNetwork: LitNetwork = LitNetwork.DatilDev
-  chain: string = "ethereum"
+  chain: string = "amoy"
   private readonly ethereumAuthWallet: ethers.Wallet
 
   constructor(ethereumAuthWallet: ethers.Wallet) {
     this.ethereumAuthWallet = ethereumAuthWallet
-    this.client = new LitNodeClientNodeJs({ litNetwork: LitNetwork.DatilDev })
+    this.client = new LitNodeClientNodeJs({
+      litNetwork: LitNetwork.DatilDev,
+      debug: false,
+    })
   }
 
   async connect(): Promise<void> {
@@ -47,13 +47,13 @@ export class LitProtocol {
     const { ciphertext: encryptedString, dataToEncryptHash: stringHash } =
       await this.client.encrypt({
         dataToEncrypt: data,
-        unifiedAccessControlConditions: [
+        unifiedAccessControlConditions: unifiedAccessControlConditions || [
           LitProtocol.generateAccessControlConditionBalance(),
         ],
       })
 
     return {
-      encryptedString: uint8arrayFromString(encryptedString, "base64"),
+      encryptedString,
       stringHash,
     }
   }
@@ -101,13 +101,13 @@ export class LitProtocol {
       chain: this.chain,
       ciphertext: encryptedString,
       dataToEncryptHash: stringHash,
-      unifiedAccessControlConditions: [
+      unifiedAccessControlConditions: unifiedAccessControlConditions || [
         LitProtocol.generateAccessControlConditionBalance(),
       ],
       sessionSigs,
     })
 
-    return uint8arrayToString(decryptedData, "utf-8")
+    return uint8arrayToString(decryptedData)
   }
 
   static generateAccessControlConditionBalance(
@@ -116,6 +116,7 @@ export class LitProtocol {
     return {
       contractAddress: "",
       standardContractType: "",
+      conditionType: "evmBasic",
       chain: "amoy",
       method: "eth_getBalance",
       parameters: [":userAddress"],

@@ -4,10 +4,10 @@ import {
   OnChainClientOptions,
   OffChainClientOptions,
   SignType,
-} from "../types"
-import { SignProtocolClientBase } from "../interface/SignProtocolClientBase"
-import EvmClients from "./evm"
-import { EvmChains } from "./evm/types"
+} from "../types/index.js"
+import { SignProtocolClientBase } from "../interface/SignProtocolClientBase.js"
+import EvmClients from "./evm/index.js"
+import { EvmChains } from "./evm/types.js"
 
 export function getClient(
   mode: SpMode,

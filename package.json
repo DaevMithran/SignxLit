@@ -1,34 +1,74 @@
 {
   "name": "@daevm/ethsign-sp-sdk",
-  "version": "0.7.7",
+  "version": "0.8.3",
   "description": "",
-  "main": "dist/index.cjs",
-  "module": "dist/index.esm.js",
-  "typings": "dist/index.d.ts",
+  "source": "src/index.ts",
+  "main": "build/esm/index.js",
+  "types": "build/types/index.d.ts",
+  "type": "module",
+  ".": {
+    "import": "./build/esm/index.js",
+    "require": "./build/cjs/index.js"
+  },
+  "./SignProtocolClient": {
+    "import": "./build/esm/SignProtocolClient.js",
+    "require": "./build/cjs/SignProtocolClient.js"
+  },
+  "./IndexService": {
+    "import": "./build/esm/IndexService.js",
+    "require": "./build/cjs/IndexService.js"
+  },
+  "./clients/evm": {
+    "import": "./build/esm/clients/evm/index.js",
+    "require": "./build/cjs/clients/evm/index.js"
+  },
+  "./utils": {
+    "import": "./build/esm/utils/index.js",
+    "require": "./build/cjs/utils/index.js"
+  },
+  "./types": {
+    "import": "./build/esm/types/index.d.ts",
+    "require": "./build/cjs/types/index.d.ts"
+  },
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c --watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pub": "npm run build && npm publish",
-    "docs:dev": "vocs dev",
-    "docs:build": "vocs build",
-    "docs:preview": "vocs preview"
+    "build": "rm -rf dist && npm run build:types && npm run build:esm",
+    "build:types": "tsc -p tsconfig.types.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:watch": "npm run build:esm -- --watch",
+    "build:local": "npm run build && cp -r dist ~/AppData/Roaming/npm/node_modules/@daevm/ethsign-sp-sdk",
+    "build:local:ubuntu": "npm run build && cp -r dist /usr/lib/node_modules/@daevm/ethsign-sp-sdk",
+    "clean": "rm -rf dist && rm tsconfig.tsbuildinfo",
+    "format": "prettier --write '**/*.{js,ts,json}'",
+    "lint": "eslint --max-warnings=0 src",
+    "semantic": "npx semantic-release",
+    "pub": "npm run build && npm publish"
   },
   "author": "tinystone007",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ethsign-sp-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ethsign-sp-sdk/issues"
+  },
+  "homepage": "https://github.com/yourusername/ethsign-sp-sdk#readme",
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "typescript",
+      "prettier"
+    ]
+  },
   "devDependencies": {
     "@lit-protocol/types": "^6.11.1",
-    "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "react": "18",
-    "react-dom": "18",
-    "rollup": "^4.9.1",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "rollup-watch": "^4.3.1",
-    "typescript": "^5.3.3",
-    "vocs": "^1.0.0-alpha.29"
+    "@types/node": "^22.9.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-typescript": "^3.0.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@lit-protocol/auth-helpers": "^6.11.1",
@@ -36,10 +76,13 @@
     "@lit-protocol/lit-node-client": "^6.11.1",
     "abitype": "^1.0.6",
     "query-string": "^9.0.0",
-    "viem": "^2.21.45",
-    "tslib": "^2.6.2"
+    "viem": "^2.21.45"
   },
   "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
