@@ -1,10 +1,35 @@
 {
   "name": "@daevm/ethsign-sp-sdk",
-  "version": "0.8.0",
+  "version": "0.8.2",
   "description": "",
+  "source": "src/index.ts",
   "main": "build/esm/index.js",
   "types": "build/types/index.d.ts",
   "type": "module",
+  ".": {
+    "import": "build/esm/index.js",
+    "require": "build/cjs/index.js"
+  },
+  "./SignProtocolClient": {
+    "import": "build/esm/SignProtocolClient.js",
+    "require": "build/cjs/SignProtocolClient.js"
+  },
+  "./IndexService": {
+    "import": "build/esm/IndexService.js",
+    "require": "build/cjs/IndexService.js"
+  },
+  "./clients/evm": {
+    "import": "build/esm/clients/evm/index.js",
+    "require": "build/cjs/clients/evm/index.js"
+  },
+  "./utils": {
+    "import": "build/esm/utils/index.js",
+    "require": "build/cjs/utils/index.js"
+  },
+  "./types": {
+    "import": "build/esm/types/index.d.ts",
+    "require": "build/cjs/types/index.d.ts"
+  },
   "scripts": {
     "build": "rm -rf dist && npm run build:types && npm run build:esm && npm run build:cjs",
     "build:types": "tsc -p tsconfig.types.json",
@@ -13,9 +38,6 @@
     "build:watch": "npm run build:esm -- --watch",
     "build:local": "npm run build && cp -r dist ~/AppData/Roaming/npm/node_modules/@daevm/ethsign-sp-sdk",
     "build:local:ubuntu": "npm run build && cp -r dist /usr/lib/node_modules/@daevm/ethsign-sp-sdk",
-    "test": "jest --passWithNoTests",
-    "test:ci": "jest --config=jest.json",
-    "test:watch": "npm run test -- --watch --verbose",
     "clean": "rm -rf dist && rm tsconfig.tsbuildinfo",
     "format": "prettier --write '**/*.{js,ts,json}'",
     "lint": "eslint --max-warnings=0 src",
