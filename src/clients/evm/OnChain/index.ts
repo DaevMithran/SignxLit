@@ -20,6 +20,7 @@ import {
   ContractInfo,
   CreateAttestationOnChainOptions,
   DataLocationOnChain,
+  GetAttestationChainOptions,
   OnChainAttestation,
   OnChainClientOptions,
   OnChainSchema,
@@ -28,21 +29,21 @@ import {
   Schema,
   SchemaItem,
   SchemaResult,
-} from "../../../types"
+} from "../../../types/index.js"
 import {
   decodeOnChainData,
   decodeOnChainEncryptedData,
   encodeOnChainData,
   encodeOnChainEncryptedData,
   validateObject,
-} from "../../../utils"
-import { SignProtocolClientBase } from "../../../interface/SignProtocolClientBase"
-import { EvmChains } from "../types"
-import { ContractInfoMap } from "../constants"
-import abiJson from "./abi/SignProtocal.json"
-import { getDataFromStorage } from "../../../services"
+} from "../../../utils/index.js"
+import { SignProtocolClientBase } from "../../../interface/SignProtocolClientBase.js"
+import { EvmChains } from "../types.js"
+import { ContractInfoMap } from "../constants.js"
+import abiJson from "./abi/SignProtocal.json" assert { type: "json" }
+import { getDataFromStorage } from "../../../services.js"
 import { ethers } from "ethers"
-import { LitProtocol } from "../../../LitprotocolClient"
+import { LitProtocol } from "../../../LitprotocolClient.js"
 import {
   uint8arrayFromString,
   uint8arrayToString,
@@ -91,8 +92,8 @@ export class OnChainClient implements SignProtocolClientBase {
         transport: privateKeyAccount
           ? http()
           : window.ethereum
-          ? custom(window.ethereum)
-          : http(),
+            ? custom(window.ethereum)
+            : http(),
       })
     this.privateKeyAccount = privateKeyAccount
   }
@@ -361,10 +362,7 @@ export class OnChainClient implements SignProtocolClientBase {
         await litprotocol.connect()
         const { encryptedString: encryptedData, stringHash } =
           await litprotocol.encrypt(uint8arrayFromString(JSON.stringify(data)))
-        encodedData = encodeOnChainEncryptedData(
-          uint8arrayToString(encryptedData),
-          stringHash
-        )
+        encodedData = encodeOnChainEncryptedData(encryptedData, stringHash)
       } else {
         encodedData = encodeOnChainData(
           data,
@@ -440,7 +438,10 @@ export class OnChainClient implements SignProtocolClientBase {
     }
   }
 
-  async getAttestation(attestationId: string): Promise<Attestation> {
+  async getAttestation(
+    attestationId: string,
+    options?: GetAttestationChainOptions
+  ): Promise<Attestation> {
     const res: any = await this.invokeContractRead("getAttestation", [
       attestationId,
     ])
@@ -451,14 +452,9 @@ export class OnChainClient implements SignProtocolClientBase {
     const schemaId = numberToHex(res.schemaId)
     const schema = await this.getSchema(schemaId)
     const schemaData = schema.data
-    const data = decodeOnChainData(
-      res.data,
-      res.dataLocation,
-      schemaData as SchemaItem[]
-    )
 
     let decodedData: Record<string, any>
-    if (res.gated) {
+    if (options?.gated) {
       const litprotocol = new LitProtocol(this.wallet!)
       await litprotocol.connect()
 

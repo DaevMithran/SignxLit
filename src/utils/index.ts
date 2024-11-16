@@ -1,7 +1,7 @@
 import { decodeAbiParameters, encodeAbiParameters } from "viem"
 
 import queryString from "query-string"
-import { DataLocationOnChain, SchemaItem } from "../types"
+import { DataLocationOnChain, SchemaItem } from "../types/index.js"
 
 export function request(url: string, options?: RequestInit) {
   const defaultOptions = {
@@ -31,13 +31,7 @@ export function request(url: string, options?: RequestInit) {
     })
 }
 
-export function validateObject(
-  obj: any,
-  fields: {
-    name: string
-    type: string
-  }[]
-): boolean {
+export function validateObject(obj: any, fields: SchemaItem[]): boolean {
   const objFields = Object.keys(obj).map((key) => ({
     name: key,
     type: typeof obj[key],
@@ -47,10 +41,9 @@ export function validateObject(
   }
 
   return fields.every((rule) => {
-    const objField = objFields.find((field) => field.name === rule.name) as {
-      name: string
-      type: string
-    }
+    const objField = objFields.find(
+      (field) => field.name === rule.name && field.type === rule.type
+    )
     if (!objField) {
       throw new Error(`Field ${rule.name} is required`)
     }
@@ -81,8 +74,11 @@ export function encodeOnChainData(
 }
 
 export function encodeOnChainEncryptedData(data: string, hash: string) {
-  return encodeAbiParameters<any>(
-    [{ type: "string" }, { type: "string" }],
+  return encodeAbiParameters(
+    [
+      { name: "data", type: "string" },
+      { name: "hash", type: "string" },
+    ],
     [data, hash]
   )
 }
@@ -118,8 +114,11 @@ export function decodeOnChainData(
 }
 
 export function decodeOnChainEncryptedData(data: any) {
-  return decodeAbiParameters<any>(
-    [{ type: "string" }, { type: "string" }],
+  return decodeAbiParameters(
+    [
+      { name: "data", type: "string" },
+      { name: "hash", type: "string" },
+    ],
     data
   )
 }

@@ -1,37 +1,37 @@
 {
   "name": "@daevm/ethsign-sp-sdk",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "",
   "source": "src/index.ts",
   "main": "build/esm/index.js",
   "types": "build/types/index.d.ts",
   "type": "module",
   ".": {
-    "import": "build/esm/index.js",
-    "require": "build/cjs/index.js"
+    "import": "./build/esm/index.js",
+    "require": "./build/cjs/index.js"
   },
   "./SignProtocolClient": {
-    "import": "build/esm/SignProtocolClient.js",
-    "require": "build/cjs/SignProtocolClient.js"
+    "import": "./build/esm/SignProtocolClient.js",
+    "require": "./build/cjs/SignProtocolClient.js"
   },
   "./IndexService": {
-    "import": "build/esm/IndexService.js",
-    "require": "build/cjs/IndexService.js"
+    "import": "./build/esm/IndexService.js",
+    "require": "./build/cjs/IndexService.js"
   },
   "./clients/evm": {
-    "import": "build/esm/clients/evm/index.js",
-    "require": "build/cjs/clients/evm/index.js"
+    "import": "./build/esm/clients/evm/index.js",
+    "require": "./build/cjs/clients/evm/index.js"
   },
   "./utils": {
-    "import": "build/esm/utils/index.js",
-    "require": "build/cjs/utils/index.js"
+    "import": "./build/esm/utils/index.js",
+    "require": "./build/cjs/utils/index.js"
   },
   "./types": {
-    "import": "build/esm/types/index.d.ts",
-    "require": "build/cjs/types/index.d.ts"
+    "import": "./build/esm/types/index.d.ts",
+    "require": "./build/cjs/types/index.d.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && npm run build:types && npm run build:esm && npm run build:cjs",
+    "build": "rm -rf dist && npm run build:types && npm run build:esm",
     "build:types": "tsc -p tsconfig.types.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
@@ -54,14 +54,6 @@
     "url": "https://github.com/yourusername/ethsign-sp-sdk/issues"
   },
   "homepage": "https://github.com/yourusername/ethsign-sp-sdk#readme",
-  "files": [
-    "dist",
-    "src",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "tsconfig.json"
-  ],
   "eslintConfig": {
     "root": true,
     "extends": [

@@ -1,7 +1,6 @@
-import { DataLocationOnChain } from './types';
-import { SchemaInfo } from './types/indexService';
-import { OffChainRpc } from './types/offChain';
-import { request, stringifyQueryString } from './utils';
+import { DataLocationOnChain } from './types/index.js';
+import { OffChainRpc } from './types/offChain.js';
+import { request } from './utils/index.js';
 
 export const getDataFromStorage = async (data: {
   dataId: string;

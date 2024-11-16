@@ -1,9 +1,9 @@
 import { PrivateKeyAccount } from "viem/accounts"
-import { EvmChains } from "../clients/evm/types"
-import { OffChainRpc } from "./offChain"
+import { EvmChains } from "../clients/evm/types.js"
+import { OffChainRpc } from "./offChain.js"
 import { WalletClient } from "viem"
 import { AbiType } from "abitype"
-export * from "./indexService"
+export * from "./indexService.js"
 
 export type ContractInfo = {
   address: Address
@@ -126,6 +126,7 @@ type CommonAttestation = {
   recipients?: string[]
   indexingValue: string
   attester?: Address
+  gated?: boolean
 }
 export type OnChainAttestation =
   | (CommonAttestation & {
@@ -196,6 +197,10 @@ export type CreateAttestationOnChainOptions = {
   getTxHash?: (txHash: `0x${string}`) => void
   recipientEncodingType?: RecipientEncodingType
   extraData?: `0x${string}`
+  gated?: boolean
+}
+
+export type GetAttestationChainOptions = {
   gated?: boolean
 }
 

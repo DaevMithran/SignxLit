@@ -1,7 +1,7 @@
-import { AttestationInfo, PageInfo, SchemaInfo } from './types/indexService';
-import { OffChainRpc } from './types/offChain';
-import { request, stringifyQueryString } from './utils';
-import { checkId } from './utils/tools';
+import { AttestationInfo, PageInfo, SchemaInfo } from './types/indexService.js';
+import { OffChainRpc } from './types/offChain.js';
+import { request, stringifyQueryString } from './utils/index.js';
+import { checkId } from './utils/tools.js';
 
 export class IndexService {
   private host: OffChainRpc;

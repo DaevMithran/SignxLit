@@ -14,7 +14,9 @@
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "rootDir": "src",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "target": "esnext",
+    "module": "esnext"
   },
   "include": ["src/**/*", "src/**/**/**/*.json"]
 }

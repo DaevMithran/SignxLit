@@ -27,9 +27,9 @@ import {
   celo,
   celoAlfajores,
 } from 'viem/chains';
-import { EvmChains } from './types';
+import { EvmChains } from './types.js';
 import { Address } from 'viem';
-import { DataLocationOffChain } from '../../types';
+import { DataLocationOffChain } from '../../types/index.js';
 
 export const ContractInfoMap = {
   [EvmChains.mainnet]: {

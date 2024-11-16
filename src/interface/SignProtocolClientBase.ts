@@ -2,12 +2,13 @@ import {
   Attestation,
   AttestationResult,
   CreateAttestationOnChainOptions,
+  GetAttestationChainOptions,
   RecipientEncodingType,
   RevokeAttestationOnChainOptions,
   RevokeAttestationResult,
   Schema,
   SchemaResult,
-} from "../types"
+} from "../types/index.js"
 
 export interface SignProtocolClientBase {
   createSchema(schema: Schema): Promise<SchemaResult>
@@ -24,7 +25,10 @@ export interface SignProtocolClientBase {
     options?: CreateAttestationOnChainOptions
   ): Promise<AttestationResult>
 
-  getAttestation(attestationId: string): Promise<Attestation>
+  getAttestation(
+    attestationId: string,
+    options?: GetAttestationChainOptions
+  ): Promise<Attestation>
 
   revokeAttestation(
     attestationId: string,
