@@ -1,13 +1,13 @@
-import { PrivateKeyAccount } from 'viem/accounts';
-import { EvmChains } from '../clients/evm/types';
-import { OffChainRpc } from './offChain';
-import { WalletClient } from 'viem';
-import { AbiType } from 'abitype';
+import { PrivateKeyAccount } from "viem/accounts"
+import { EvmChains } from "../clients/evm/types"
+import { OffChainRpc } from "./offChain"
+import { WalletClient } from "viem"
+import { AbiType } from "abitype"
 
 export type ContractInfo = {
-  address: Address;
-  chain: any;
-};
+  address: Address
+  chain: any
+}
 
 export enum DataLocationOnChain {
   ONCHAIN, // only when Mode=OnChain
@@ -16,90 +16,92 @@ export enum DataLocationOnChain {
 }
 
 export enum DataLocationOffChain {
-  ARWEAVE = 'arweave',
-  IPFS = 'ipfs',
-  GREENFIELD = 'greenfield',
-  GREENFIELD_TESTTNET = 'greenfield-testnet',
+  ARWEAVE = "arweave",
+  IPFS = "ipfs",
+  GREENFIELD = "greenfield",
+  GREENFIELD_TESTTNET = "greenfield-testnet",
 }
 
-export type DataLocation = DataLocationOnChain | DataLocationOffChain;
+export type DataLocation = DataLocationOnChain | DataLocationOffChain
 export enum SignType {
-  'eip712' = 'eip712',
+  "eip712" = "eip712",
 }
 export enum OffChainSignType {
-  EvmEip712 = 'evm-eip712',
+  EvmEip712 = "evm-eip712",
 }
 export type SchemaItem = {
-  name: string;
-  type: AbiType;
-};
-export type Address = `0x${string}`;
+  name: string
+  type: AbiType
+}
+export type Address = `0x${string}`
 
 export type SchemaResult = {
-  schemaId: string;
-  txHash?: string;
-};
+  schemaId: string
+  txHash?: string
+}
 export type AttestationResult = {
-  attestationId: string;
-  indexingValue: string;
-  txHash?: string;
-};
+  attestationId: string
+  indexingValue: string
+  txHash?: string
+}
 export enum ChainType {
-  evm = 'evm',
+  evm = "evm",
 }
 export enum SpMode {
-  OnChain = 'OnChain',
-  OffChain = 'OffChain',
+  OnChain = "OnChain",
+  OffChain = "OffChain",
 }
 
 export type OnChainClientOptions = {
-  chain: EvmChains;
-  account?: PrivateKeyAccount;
-  rpcUrl?: string;
-  walletClient?: WalletClient;
-};
+  chain: EvmChains
+  account?: PrivateKeyAccount
+  wallet?: any
+  rpcUrl?: string
+  walletClient?: WalletClient
+}
 
 export type OffChainClientOptions = {
-  signType: OffChainSignType;
-  account?: PrivateKeyAccount;
-  rpcUrl?: OffChainRpc | string;
-  walletClient?: WalletClient;
-};
+  signType: OffChainSignType
+  account?: PrivateKeyAccount
+  rpcUrl?: OffChainRpc | string
+  walletClient?: WalletClient
+  wallet?: any
+}
 
 type CommonSchema = {
-  name: string;
-  description?: string;
-  revocable?: boolean; //Whether Attestations that adopt this Schema can be revoked.
-  maxValidFor?: number; //The maximum number of seconds that an Attestation can remain valid. 0 means Attestations can be valid forever. This is enforced through `Attestation.validUntil`.
-};
+  name: string
+  description?: string
+  revocable?: boolean //Whether Attestations that adopt this Schema can be revoked.
+  maxValidFor?: number //The maximum number of seconds that an Attestation can remain valid. 0 means Attestations can be valid forever. This is enforced through `Attestation.validUntil`.
+}
 
 export type OnChainSchema =
   | (CommonSchema & {
       /**
        * @deprecated please use `hook` instead
        */
-      resolver?: Address;
-      hook?: Address;
-      registrant: Address;
-      timestamp?: number;
-      dataLocation?: DataLocationOnChain.ONCHAIN; //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
-      data: SchemaItem[]; // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
+      resolver?: Address
+      hook?: Address
+      registrant: Address
+      timestamp?: number
+      dataLocation?: DataLocationOnChain.ONCHAIN //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
+      data: SchemaItem[] // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
     })
   | (CommonSchema & {
-      resolver?: Address;
-      hook?: Address;
-      registrant: Address;
-      dataLocation: DataLocationOnChain.ARWEAVE | DataLocationOnChain.IPFS; //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
-      data: string; // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
-    });
+      resolver?: Address
+      hook?: Address
+      registrant: Address
+      dataLocation: DataLocationOnChain.ARWEAVE | DataLocationOnChain.IPFS //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
+      data: string // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
+    })
 
 export type OffChainSchema = CommonSchema & {
   dataLocation?:
     | DataLocationOffChain.ARWEAVE
     | DataLocationOffChain.IPFS
-    | DataLocationOffChain.GREENFIELD;
-  data: SchemaItem[];
-};
+    | DataLocationOffChain.GREENFIELD
+  data: SchemaItem[]
+}
 
 /**
  * Schema is a template for Attestations. It defines the structure of the data that can be included in an Attestation, and the rules that apply to it.
@@ -113,37 +115,37 @@ export type OffChainSchema = CommonSchema & {
  * @property {Address} [resolver] - The `ISPResolver` that is called at the end of every function. 0 means there is no resolver set. See `ISPResolver`.
  * @property {SchemaItem[] | string} data - // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
  */
-export type Schema = OnChainSchema | OffChainSchema;
+export type Schema = OnChainSchema | OffChainSchema
 
 type CommonAttestation = {
-  schemaId: string;
-  linkedAttestationId?: string | null;
-  validUntil?: number;
-  revoked?: boolean | null;
-  recipients?: string[];
-  indexingValue: string;
-  attester?: Address;
-};
+  schemaId: string
+  linkedAttestationId?: string | null
+  validUntil?: number
+  revoked?: boolean | null
+  recipients?: string[]
+  indexingValue: string
+  attester?: Address
+}
 export type OnChainAttestation =
   | (CommonAttestation & {
-      attestTimestamp?: number;
-      revokeTimestamp?: number;
-      dataLocation?: DataLocationOnChain.ONCHAIN; //Where `Attestation.data` is stored. See `DataLocation.DataLocation`.
-      data: { [key: string]: any };
+      attestTimestamp?: number
+      revokeTimestamp?: number
+      dataLocation?: DataLocationOnChain.ONCHAIN //Where `Attestation.data` is stored. See `DataLocation.DataLocation`.
+      data: { [key: string]: any }
     })
   | (CommonAttestation & {
-      attestTimestamp?: number;
-      revokeTimestamp?: number;
-      dataLocation: DataLocationOnChain.ARWEAVE | DataLocationOnChain.IPFS; //Where `Attestation.data` is stored. See `DataLocation.DataLocation`.
-      data: string;
-    });
+      attestTimestamp?: number
+      revokeTimestamp?: number
+      dataLocation: DataLocationOnChain.ARWEAVE | DataLocationOnChain.IPFS //Where `Attestation.data` is stored. See `DataLocation.DataLocation`.
+      data: string
+    })
 type OffChainAttestation = CommonAttestation & {
   dataLocation?:
     | DataLocationOffChain.ARWEAVE
     | DataLocationOffChain.IPFS
-    | DataLocationOffChain.GREENFIELD;
-  data: { [key: string]: any };
-};
+    | DataLocationOffChain.GREENFIELD
+  data: { [key: string]: any }
+}
 /**
  * This struct represents an on-chain attestation record. This record is not deleted after revocation.
  * @typedef Attestation
@@ -155,42 +157,42 @@ type OffChainAttestation = CommonAttestation & {
  * @property {string[]} [recipients] - The intended  recipients of this Attestation.
  * @property {string} indexingValue - The value that is used to index this Attestation.
  */
-export type Attestation = OnChainAttestation | OffChainAttestation;
+export type Attestation = OnChainAttestation | OffChainAttestation
 
 export type AttestationDelegationSignature = {
-  attestation: Attestation;
-  delegationSignature: `0x${string}`;
-};
+  attestation: Attestation
+  delegationSignature: `0x${string}`
+}
 export type SchemaDelegationSignature = {
-  schema: OnChainSchema;
-  delegationSignature: `0x${string}`;
-};
+  schema: OnChainSchema
+  delegationSignature: `0x${string}`
+}
 export type RevokeDelegationSignature = {
-  attestationId: string;
-  delegationSignature: `0x${string}`;
-  reason?: string;
-};
+  attestationId: string
+  delegationSignature: `0x${string}`
+  reason?: string
+}
 
 export type RevokeAttestationResult = {
-  attestationId: string;
-  txHash?: string;
-  reason?: string;
-};
+  attestationId: string
+  txHash?: string
+  reason?: string
+}
 
 export type AttestationRevokeInfo = {
-  attestationId: string;
-  revokeReason: string;
-};
+  attestationId: string
+  revokeReason: string
+}
 
 export enum RecipientEncodingType {
-  Address = 'address',
-  String = 'string',
+  Address = "address",
+  String = "string",
 }
 
 export type CreateAttestationOnChainOptions = {
-  resolverFeesETH?: BigInt; //unit wei
-  delegationSignature?: string;
-  getTxHash?: (txHash: `0x${string}`) => void;
-  recipientEncodingType?: RecipientEncodingType;
-  extraData?: `0x${string}`;
-};
+  resolverFeesETH?: BigInt //unit wei
+  delegationSignature?: string
+  getTxHash?: (txHash: `0x${string}`) => void
+  recipientEncodingType?: RecipientEncodingType
+  extraData?: `0x${string}`
+}

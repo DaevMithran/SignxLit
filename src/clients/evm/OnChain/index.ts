@@ -13,7 +13,7 @@ import {
   createWalletClient,
   custom,
   isAddress,
-} from 'viem';
+} from "viem"
 import {
   Attestation,
   AttestationResult,
@@ -28,33 +28,36 @@ import {
   Schema,
   SchemaItem,
   SchemaResult,
-} from '../../../types';
+} from "../../../types"
 import {
   decodeOnChainData,
   encodeOnChainData,
   validateObject,
-} from '../../../utils';
-import { SignProtocolClientBase } from '../../../interface/SignProtocolClientBase';
-import { EvmChains } from '../types';
-import { ContractInfoMap } from '../constants';
-import abiJson from './abi/SignProtocal.json';
-import { getDataFromStorage } from '../../../services';
+} from "../../../utils"
+import { SignProtocolClientBase } from "../../../interface/SignProtocolClientBase"
+import { EvmChains } from "../types"
+import { ContractInfoMap } from "../constants"
+import abiJson from "./abi/SignProtocal.json"
+import { getDataFromStorage } from "../../../services"
+import { ethers } from "ethers"
 export class OnChainClient implements SignProtocolClientBase {
-  public walletClient: WalletClient;
-  public publicClient!: PublicClient;
-  public contractInfo!: ContractInfo;
-  public privateKeyAccount?: PrivateKeyAccount;
-  public chain: any;
-  public account!: { address: `0x${string}` };
+  public walletClient: WalletClient
+  public publicClient!: PublicClient
+  public contractInfo!: ContractInfo
+  public privateKeyAccount?: PrivateKeyAccount
+  public chain: any
+  public account!: { address: `0x${string}` }
+  public wallet: ethers.Wallet
   constructor({
     chain: chainType,
     rpcUrl: rpc,
     account: privateKeyAccount,
     walletClient,
+    wallet,
   }: OnChainClientOptions) {
     this.contractInfo = chainType
       ? ContractInfoMap[chainType]
-      : ContractInfoMap[EvmChains.sepolia];
+      : ContractInfoMap[EvmChains.sepolia]
     const chain = {
       ...this.contractInfo?.chain,
       rpcUrls: rpc
@@ -64,13 +67,14 @@ export class OnChainClient implements SignProtocolClientBase {
             },
           }
         : this.contractInfo?.chain.rpcUrls,
-    };
-    this.chain = chain;
+    }
+    this.chain = chain
+    this.wallet = wallet
     // @ts-ignore
     this.publicClient = createPublicClient({
       chain,
       transport: http(),
-    });
+    })
     this.walletClient =
       walletClient ||
       createWalletClient({
@@ -80,45 +84,45 @@ export class OnChainClient implements SignProtocolClientBase {
           : window.ethereum
           ? custom(window.ethereum)
           : http(),
-      });
-    this.privateKeyAccount = privateKeyAccount;
+      })
+    this.privateKeyAccount = privateKeyAccount
   }
 
   public async signMessage(message: string): Promise<`0x${string}`> {
-    const account = await this.getAccount();
+    const account = await this.getAccount()
     return await this.walletClient.signMessage({
       account: this.privateKeyAccount ? account : account.address,
       message: { raw: message as any },
-    });
+    })
   }
   public async swithChain() {
-    const walletChainId = await this.walletClient.getChainId();
+    const walletChainId = await this.walletClient.getChainId()
     if (walletChainId !== this.chain.id) {
       try {
         await this.walletClient.switchChain({
           id: this.chain.id,
-        });
+        })
       } catch (error: any) {
         if (error?.code !== 4001) {
           await this.walletClient.addChain({
             chain: this.chain,
-          });
+          })
           await this.walletClient.switchChain({
             id: this.chain.id,
-          });
+          })
         }
       }
     }
   }
   public async getAccount() {
-    let account;
+    let account
     if (this.privateKeyAccount) {
-      account = this.privateKeyAccount;
+      account = this.privateKeyAccount
     } else {
-      const accounts = await this.walletClient.getAddresses();
-      account = { address: accounts[0] } as PrivateKeyAccount;
+      const accounts = await this.walletClient.getAddresses()
+      account = { address: accounts[0] } as PrivateKeyAccount
     }
-    return account;
+    return account
   }
 
   public async invokeContractRead(
@@ -131,10 +135,10 @@ export class OnChainClient implements SignProtocolClientBase {
         abi: abiJson.abi,
         functionName,
         args,
-      });
+      })
     } catch (error: any) {
-      console.error(error.message);
-      throw error;
+      console.error(error.message)
+      throw error
     }
   }
 
@@ -145,8 +149,8 @@ export class OnChainClient implements SignProtocolClientBase {
     abi?: any
   ): Promise<WriteContractReturnType> {
     try {
-      const account = await this.getAccount();
-      await this.swithChain();
+      const account = await this.getAccount()
+      await this.swithChain()
       const data = {
         account: this.privateKeyAccount ? account : account.address,
         address: this.contractInfo.address,
@@ -155,20 +159,20 @@ export class OnChainClient implements SignProtocolClientBase {
         args,
         value,
         chain: this.chain,
-      };
-      const { request } = await this.publicClient.simulateContract(data);
-      return this.walletClient.writeContract(request);
+      }
+      const { request } = await this.publicClient.simulateContract(data)
+      return this.walletClient.writeContract(request)
     } catch (error: any) {
-      console.error(error.message);
-      throw error;
+      console.error(error.message)
+      throw error
     }
   }
 
   async createSchema(
     schema: OnChainSchema,
     options?: {
-      delegationSignature?: string;
-      getTxHash?: (txHash: `0x${string}`) => void;
+      delegationSignature?: string
+      getTxHash?: (txHash: `0x${string}`) => void
     }
   ): Promise<SchemaResult> {
     const {
@@ -180,44 +184,44 @@ export class OnChainClient implements SignProtocolClientBase {
       name,
       description,
       registrant,
-    } = schema;
-    const account = await this.getAccount();
-    const dataLocation = schema.dataLocation || DataLocationOnChain.ONCHAIN;
-    const { delegationSignature, getTxHash } = options || {};
-    const txHash = await this.invokeContractWrite('register', [
+    } = schema
+    const account = await this.getAccount()
+    const dataLocation = schema.dataLocation || DataLocationOnChain.ONCHAIN
+    const { delegationSignature, getTxHash } = options || {}
+    const txHash = await this.invokeContractWrite("register", [
       {
         registrant: registrant || account.address,
         revocable: revocable === undefined ? true : revocable,
         dataLocation: dataLocation,
         maxValidFor: maxValidFor || 0,
-        hook: hook || resolver || '0x0000000000000000000000000000000000000000',
+        hook: hook || resolver || "0x0000000000000000000000000000000000000000",
         timestamp: 0,
         data:
           dataLocation === DataLocationOnChain.ONCHAIN
             ? JSON.stringify({ name, description, data })
             : data,
       },
-      delegationSignature || '',
-    ]);
-    getTxHash && getTxHash(txHash);
+      delegationSignature || "",
+    ])
+    getTxHash && getTxHash(txHash)
     const res = await this.publicClient.waitForTransactionReceipt({
       hash: txHash,
-    });
+    })
 
     const decodedLog: any = decodeEventLog<any, any, any, any>({
       abi: abiJson.abi,
       topics: res.logs[0].topics,
       data: res.logs[0].data,
-    });
+    })
 
-    const schemaId = numberToHex(decodedLog.args.schemaId);
-    return { schemaId, txHash };
+    const schemaId = numberToHex(decodedLog.args.schemaId)
+    return { schemaId, txHash }
   }
 
   async getSchema(schemaId: string): Promise<Schema> {
-    const res: any = await this.invokeContractRead('getSchema', [schemaId]);
-    if (res.data === '') {
-      throw new Error('schema not found');
+    const res: any = await this.invokeContractRead("getSchema", [schemaId])
+    if (res.data === "") {
+      throw new Error("schema not found")
     }
     const {
       revocable,
@@ -227,17 +231,17 @@ export class OnChainClient implements SignProtocolClientBase {
       hook,
       data,
       timestamp,
-    } = res;
-    const isOnChain = dataLocation === DataLocationOnChain.ONCHAIN;
-    let dataObj: any;
+    } = res
+    const isOnChain = dataLocation === DataLocationOnChain.ONCHAIN
+    let dataObj: any
     if (isOnChain) {
-      dataObj = JSON.parse(data);
+      dataObj = JSON.parse(data)
     } else if (
       dataLocation === DataLocationOnChain.ARWEAVE ||
       dataLocation === DataLocationOnChain.IPFS
     ) {
-      const res = await getDataFromStorage({ dataId: data, dataLocation });
-      dataObj = res.data;
+      const res = await getDataFromStorage({ dataId: data, dataLocation })
+      dataObj = res.data
     }
     const result: Schema = {
       name: dataObj.name,
@@ -249,37 +253,37 @@ export class OnChainClient implements SignProtocolClientBase {
       hook: hook || resolver,
       data: dataObj.data,
       registrant: res.registrant,
-    };
-    return result;
+    }
+    return result
   }
 
   async revokeAttestation(
     attestationId: string,
     options?: {
-      reason?: string;
-      delegationSignature?: string;
-      getTxHash?: (txHash: `0x${string}`) => void;
+      reason?: string
+      delegationSignature?: string
+      getTxHash?: (txHash: `0x${string}`) => void
     }
   ): Promise<RevokeAttestationResult> {
-    const { reason, delegationSignature, getTxHash } = options || {};
-    const txHash = await this.invokeContractWrite('revoke', [
+    const { reason, delegationSignature, getTxHash } = options || {}
+    const txHash = await this.invokeContractWrite("revoke", [
       attestationId,
-      reason || '',
-      delegationSignature || '',
-      '',
-    ]);
-    getTxHash && getTxHash(txHash);
+      reason || "",
+      delegationSignature || "",
+      "",
+    ])
+    getTxHash && getTxHash(txHash)
     const res = await this.publicClient.waitForTransactionReceipt({
       hash: txHash,
-    });
+    })
 
     const decodedLog: any = decodeEventLog<any, any, any, any>({
       abi: abiJson.abi,
       topics: res.logs[0].topics,
       data: res.logs[0].data,
-    });
-    const id = numberToHex(decodedLog.args.attestationId);
-    return { attestationId: id, txHash, reason: decodedLog.args.reason };
+    })
+    const id = numberToHex(decodedLog.args.attestationId)
+    return { attestationId: id, txHash, reason: decodedLog.args.reason }
   }
   async createAttestation(
     attestation: OnChainAttestation,
@@ -296,17 +300,16 @@ export class OnChainClient implements SignProtocolClientBase {
       attester,
       attestTimestamp,
       revokeTimestamp,
-    } = attestation;
+    } = attestation
     const {
       delegationSignature,
       getTxHash,
       resolverFeesETH,
       recipientEncodingType,
       extraData,
-    } = options || {};
-    const dataLocation =
-      attestation.dataLocation || DataLocationOnChain.ONCHAIN;
-    let attestationData;
+    } = options || {}
+    const dataLocation = attestation.dataLocation || DataLocationOnChain.ONCHAIN
+    let attestationData
     if (delegationSignature) {
       attestationData = {
         schemaId,
@@ -319,29 +322,29 @@ export class OnChainClient implements SignProtocolClientBase {
         dataLocation,
         attestTimestamp,
         revokeTimestamp,
-      };
+      }
     } else {
-      const account = await this.getAccount();
+      const account = await this.getAccount()
       if (!attestation.schemaId) {
-        throw new Error('schemaId is required');
+        throw new Error("schemaId is required")
       }
 
-      const schema = await this.getSchema(attestation.schemaId);
-      const schemaData = schema?.data;
+      const schema = await this.getSchema(attestation.schemaId)
+      const schemaData = schema?.data
       if (!schema) {
-        throw new Error('schema not found');
+        throw new Error("schema not found")
       }
       if (
         schema.dataLocation === DataLocationOnChain.ONCHAIN &&
         dataLocation === DataLocationOnChain.ONCHAIN &&
         !validateObject(data, schemaData as SchemaItem[])
       ) {
-        throw new Error('data is not valid');
+        throw new Error("data is not valid")
       }
 
       attestationData = {
         schemaId,
-        linkedAttestationId: linkedAttestationId || '',
+        linkedAttestationId: linkedAttestationId || "",
         attester: attester || account.address,
         validUntil: BigInt(validUntil || 0),
         revoked: revoked || false,
@@ -350,11 +353,11 @@ export class OnChainClient implements SignProtocolClientBase {
         revokeTimestamp: 0,
         recipients:
           recipients?.map((item: string) => {
-            const isRecipientAddress = isAddress(item);
+            const isRecipientAddress = isAddress(item)
             return encodeAbiParameters<any>(
               [
                 {
-                  name: 'data',
+                  name: "data",
                   type:
                     isRecipientAddress &&
                     recipientEncodingType === RecipientEncodingType.Address
@@ -363,83 +366,83 @@ export class OnChainClient implements SignProtocolClientBase {
                 },
               ],
               [item]
-            );
+            )
           }) || [],
         data: encodeOnChainData(
           data,
           dataLocation as DataLocationOnChain,
           schemaData as SchemaItem[]
         ),
-      };
+      }
     }
     const params: any = [
       attestationData,
-      indexingValue || '',
-      delegationSignature || '',
-      extraData || '',
-    ];
+      indexingValue || "",
+      delegationSignature || "",
+      extraData || "",
+    ]
     const attestAbis: any = abiJson.abi.filter(
-      (item: any) => item.name === 'attest'
-    );
-    let attestAbi = [attestAbis[0]];
+      (item: any) => item.name === "attest"
+    )
+    let attestAbi = [attestAbis[0]]
     if (resolverFeesETH) {
-      params.splice(1, 0, resolverFeesETH);
-      attestAbi = [attestAbis[2]];
+      params.splice(1, 0, resolverFeesETH)
+      attestAbi = [attestAbis[2]]
     }
     const txHash = await this.invokeContractWrite(
-      'attest',
+      "attest",
       params,
       resolverFeesETH as bigint,
       [...attestAbi, ...abiJson.abi]
-    );
-    getTxHash && getTxHash(txHash);
+    )
+    getTxHash && getTxHash(txHash)
     const res = await this.publicClient.waitForTransactionReceipt({
       hash: txHash,
-    });
+    })
 
     const decodedLog: any = decodeEventLog<any, any, any, any>({
       abi: abiJson.abi,
       topics: res.logs[0].topics,
       data: res.logs[0].data,
-    });
-    const attestationId = numberToHex(decodedLog.args.attestationId);
+    })
+    const attestationId = numberToHex(decodedLog.args.attestationId)
     return {
       attestationId,
       txHash,
       indexingValue: decodedLog.args.indexingKey,
-    };
+    }
   }
 
   async getAttestation(attestationId: string): Promise<Attestation> {
-    const res: any = await this.invokeContractRead('getAttestation', [
+    const res: any = await this.invokeContractRead("getAttestation", [
       attestationId,
-    ]);
-    if (res.data === '0x') {
-      throw new Error('attestation not found');
+    ])
+    if (res.data === "0x") {
+      throw new Error("attestation not found")
     }
-    const schemaId = numberToHex(res.schemaId);
-    const schema = await this.getSchema(schemaId);
-    const schemaData = schema.data;
+    const schemaId = numberToHex(res.schemaId)
+    const schema = await this.getSchema(schemaId)
+    const schemaData = schema.data
     const data = decodeOnChainData(
       res.data,
       res.dataLocation,
       schemaData as SchemaItem[]
-    );
+    )
     const recipients = res.recipients.map((item: any) => {
-      let res;
+      let res
       try {
         res = decodeAbiParameters<any>(
-          [{ name: 'data', type: RecipientEncodingType.String }],
+          [{ name: "data", type: RecipientEncodingType.String }],
           item
-        )[0];
+        )[0]
       } catch (error) {
         res = decodeAbiParameters<any>(
-          [{ name: 'data', type: RecipientEncodingType.Address }],
+          [{ name: "data", type: RecipientEncodingType.Address }],
           item
-        )[0];
+        )[0]
       }
-      return res;
-    });
+      return res
+    })
     const result: Attestation = {
       attestTimestamp: Number(res.attestTimestamp),
       revokeTimestamp: Number(res.revokeTimestamp),
@@ -450,10 +453,10 @@ export class OnChainClient implements SignProtocolClientBase {
       dataLocation: res.dataLocation,
       validUntil: Number(res.validUntil),
       linkedAttestationId:
-        '0x' + Number(res.linkedAttestationId).toString(16) || '',
+        "0x" + Number(res.linkedAttestationId).toString(16) || "",
       indexingValue: res.indexingKey,
       attester: res.attester,
-    };
-    return result;
+    }
+    return result
   }
 }
