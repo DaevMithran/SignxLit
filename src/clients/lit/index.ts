@@ -1,0 +1,119 @@
+import {
+  LitAccessControlConditionResource,
+  createSiweMessageWithRecaps,
+  generateAuthSig,
+} from "@lit-protocol/auth-helpers"
+import { LitNetwork } from "@lit-protocol/constants"
+import {
+  LitNodeClient,
+  LitNodeClientNodeJs,
+} from "@lit-protocol/lit-node-client"
+import {
+  AccsDefaultParams,
+  LitAbility,
+  UnifiedAccessControlConditions,
+} from "@lit-protocol/types"
+import { fromString, toString } from "uint8arrays"
+import { ethers } from "ethers"
+
+export class LitProtocol {
+  client: LitNodeClient | LitNodeClientNodeJs
+  litNetwork: LitNetwork = LitNetwork.DatilDev
+  chain: string = "amoy"
+  private readonly ethereumAuthWallet: ethers.Wallet
+
+  constructor(ethereumAuthWallet: ethers.Wallet) {
+    this.ethereumAuthWallet = ethereumAuthWallet
+    this.client = new LitNodeClientNodeJs({ litNetwork: this.litNetwork })
+  }
+
+  async connect(): Promise<void> {
+    return await this.client.connect()
+  }
+
+  async encrypt(
+    data: Uint8Array,
+    unifiedAccessControlConditions?: NonNullable<UnifiedAccessControlConditions>
+  ) {
+    const { ciphertext: encryptedString, dataToEncryptHash: stringHash } =
+      await this.client.encrypt({
+        dataToEncrypt: data,
+        unifiedAccessControlConditions: [
+          LitProtocol.generateAccessControlConditionBalance(),
+        ],
+      })
+
+    return {
+      encryptedString: fromString(encryptedString, "base64"),
+      stringHash,
+    }
+  }
+
+  async decrypt(
+    encryptedString: string,
+    stringHash: string,
+    unifiedAccessControlConditions?: NonNullable<UnifiedAccessControlConditions>
+  ): Promise<string> {
+    const resourceAbilityRequests = [
+      {
+        resource: new LitAccessControlConditionResource("*"),
+        ability: LitAbility.AccessControlConditionDecryption,
+      },
+    ]
+
+    // generate session signatures
+    const sessionSigs = await this.client.getSessionSigs({
+      chain: this.chain,
+      expiration: new Date(Date.now() + 1000 * 60 * 10).toISOString(),
+      resourceAbilityRequests,
+      authNeededCallback: async ({
+        uri,
+        expiration,
+        resourceAbilityRequests,
+      }: any) => {
+        const toSign = await createSiweMessageWithRecaps({
+          uri,
+          expiration,
+          resources: resourceAbilityRequests,
+          walletAddress: await this.ethereumAuthWallet.getAddress(),
+          nonce: await this.client.getLatestBlockhash(),
+          litNodeClient: this.client,
+        })
+
+        return await generateAuthSig({
+          signer: this.ethereumAuthWallet,
+          toSign,
+        })
+      },
+    })
+
+    // decrypt
+    const { decryptedData } = await this.client.decrypt({
+      chain: this.chain,
+      ciphertext: encryptedString,
+      dataToEncryptHash: stringHash,
+      unifiedAccessControlConditions: [
+        LitProtocol.generateAccessControlConditionBalance(),
+      ],
+      sessionSigs,
+    })
+
+    return toString(decryptedData, "utf-8")
+  }
+
+  static generateAccessControlConditionBalance(
+    address = ":userAddress"
+  ): AccsDefaultParams {
+    return {
+      contractAddress: "",
+      standardContractType: "",
+      chain: "amoy",
+      method: "eth_getBalance",
+      parameters: [":userAddress"],
+      returnValueTest: {
+        comparator: ">=",
+        value: "0",
+      },
+    }
+  }
+}
