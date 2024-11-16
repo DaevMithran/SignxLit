@@ -1,22 +1,23 @@
-import { IndexService } from './IndexService';
-import { SignProtocolClient } from './SignProtocolClient';
-import { chainInfo } from './clients/evm/constants';
-import { EvmChains } from './clients/evm/types';
+import { IndexService } from "./IndexService"
+import { SignProtocolClient } from "./SignProtocolClient"
+import { chainInfo } from "./clients/evm/constants"
+import { EvmChains } from "./clients/evm/types"
 import {
   SpMode,
   OffChainSignType,
   DataLocationOnChain,
   DataLocationOffChain,
-} from './types';
-import type { DataLocation } from './types';
-import { OffChainRpc } from './types/offChain';
+} from "./types"
+import type { DataLocation } from "./types"
+import { OffChainRpc } from "./types/offChain"
 import {
   delegateSignAttestation,
   delegateSignRevokeAttestation,
   delegateSignSchema,
-} from './utils/tools';
+} from "./utils/tools"
 
-import { decodeOnChainData } from './utils';
+import { LitProtocol } from "./LitprotocolClient"
+import { decodeOnChainData } from "./utils"
 
 export {
   SignProtocolClient,
@@ -33,5 +34,6 @@ export {
   chainInfo,
   IndexService,
   decodeOnChainData,
-};
-export * from './types';
+  LitProtocol,
+}
+export * from "./types"

@@ -195,4 +195,5 @@ export type CreateAttestationOnChainOptions = {
   getTxHash?: (txHash: `0x${string}`) => void
   recipientEncodingType?: RecipientEncodingType
   extraData?: `0x${string}`
+  gated?: boolean
 }

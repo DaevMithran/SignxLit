@@ -31,7 +31,9 @@ import {
 } from "../../../types"
 import {
   decodeOnChainData,
+  decodeOnChainEncryptedData,
   encodeOnChainData,
+  encodeOnChainEncryptedData,
   validateObject,
 } from "../../../utils"
 import { SignProtocolClientBase } from "../../../interface/SignProtocolClientBase"
@@ -40,6 +42,12 @@ import { ContractInfoMap } from "../constants"
 import abiJson from "./abi/SignProtocal.json"
 import { getDataFromStorage } from "../../../services"
 import { ethers } from "ethers"
+import { LitProtocol } from "../../../LitprotocolClient"
+import {
+  uint8arrayFromString,
+  uint8arrayToString,
+} from "@lit-protocol/uint8arrays"
+
 export class OnChainClient implements SignProtocolClientBase {
   public walletClient: WalletClient
   public publicClient!: PublicClient
@@ -48,6 +56,7 @@ export class OnChainClient implements SignProtocolClientBase {
   public chain: any
   public account!: { address: `0x${string}` }
   public wallet: ethers.Wallet
+
   constructor({
     chain: chainType,
     rpcUrl: rpc,
@@ -307,6 +316,7 @@ export class OnChainClient implements SignProtocolClientBase {
       resolverFeesETH,
       recipientEncodingType,
       extraData,
+      gated,
     } = options || {}
     const dataLocation = attestation.dataLocation || DataLocationOnChain.ONCHAIN
     let attestationData
@@ -342,6 +352,27 @@ export class OnChainClient implements SignProtocolClientBase {
         throw new Error("data is not valid")
       }
 
+      // validate schema and encode data
+      let encodedData: string
+
+      // if gated encrypt the data and encode it
+      if (gated) {
+        const litprotocol = new LitProtocol(this.wallet)
+        await litprotocol.connect()
+        const { encryptedString: encryptedData, stringHash } =
+          await litprotocol.encrypt(uint8arrayFromString(JSON.stringify(data)))
+        encodedData = encodeOnChainEncryptedData(
+          uint8arrayToString(encryptedData),
+          stringHash
+        )
+      } else {
+        encodedData = encodeOnChainData(
+          data,
+          dataLocation as DataLocationOnChain,
+          schemaData as SchemaItem[]
+        )
+      }
+
       attestationData = {
         schemaId,
         linkedAttestationId: linkedAttestationId || "",
@@ -368,11 +399,7 @@ export class OnChainClient implements SignProtocolClientBase {
               [item]
             )
           }) || [],
-        data: encodeOnChainData(
-          data,
-          dataLocation as DataLocationOnChain,
-          schemaData as SchemaItem[]
-        ),
+        data: encodedData,
       }
     }
     const params: any = [
@@ -420,6 +447,7 @@ export class OnChainClient implements SignProtocolClientBase {
     if (res.data === "0x") {
       throw new Error("attestation not found")
     }
+
     const schemaId = numberToHex(res.schemaId)
     const schema = await this.getSchema(schemaId)
     const schemaData = schema.data
@@ -428,6 +456,24 @@ export class OnChainClient implements SignProtocolClientBase {
       res.dataLocation,
       schemaData as SchemaItem[]
     )
+
+    let decodedData: Record<string, any>
+    if (res.gated) {
+      const litprotocol = new LitProtocol(this.wallet!)
+      await litprotocol.connect()
+
+      const [encryptedData, stringHash] = decodeOnChainEncryptedData(res.data)
+      decodedData = JSON.parse(
+        await litprotocol.decrypt(encryptedData, stringHash)
+      )
+    } else {
+      decodedData = decodeOnChainData(
+        res.data,
+        res.dataLocation,
+        schemaData as SchemaItem[]
+      )
+    }
+
     const recipients = res.recipients.map((item: any) => {
       let res
       try {
@@ -443,6 +489,7 @@ export class OnChainClient implements SignProtocolClientBase {
       }
       return res
     })
+
     const result: Attestation = {
       attestTimestamp: Number(res.attestTimestamp),
       revokeTimestamp: Number(res.revokeTimestamp),
