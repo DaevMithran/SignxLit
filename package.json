@@ -1,6 +1,6 @@
 {
   "name": "@daevm/ethsign-sp-sdk",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "",
   "source": "src/index.ts",
   "main": "build/esm/index.js",
@@ -31,14 +31,14 @@
     "require": "./build/cjs/types/index.d.ts"
   },
   "scripts": {
-    "build": "rm -rf dist && npm run build:types && npm run build:esm",
+    "build": "rm -rf build && npm run build:types && npm run build:esm",
     "build:types": "tsc -p tsconfig.types.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:watch": "npm run build:esm -- --watch",
-    "build:local": "npm run build && cp -r dist ~/AppData/Roaming/npm/node_modules/@daevm/ethsign-sp-sdk",
-    "build:local:ubuntu": "npm run build && cp -r dist /usr/lib/node_modules/@daevm/ethsign-sp-sdk",
-    "clean": "rm -rf dist && rm tsconfig.tsbuildinfo",
+    "build:local": "npm run build && cp -r build ~/AppData/Roaming/npm/node_modules/@daevm/ethsign-sp-sdk",
+    "build:local:ubuntu": "npm run build && cp -r build /usr/lib/node_modules/@daevm/ethsign-sp-sdk",
+    "clean": "rm -rf build && rm tsconfig.tsbuildinfo",
     "format": "prettier --write '**/*.{js,ts,json}'",
     "lint": "eslint --max-warnings=0 src",
     "semantic": "npx semantic-release",

@@ -44,10 +44,7 @@ import abiJson from "./abi/SignProtocal.json" assert { type: "json" }
 import { getDataFromStorage } from "../../../services.js"
 import { ethers } from "ethers"
 import { LitProtocol } from "../../../LitprotocolClient.js"
-import {
-  uint8arrayFromString,
-  uint8arrayToString,
-} from "@lit-protocol/uint8arrays"
+import { uint8arrayFromString } from "@lit-protocol/uint8arrays"
 
 export class OnChainClient implements SignProtocolClientBase {
   public walletClient: WalletClient
@@ -318,6 +315,7 @@ export class OnChainClient implements SignProtocolClientBase {
       recipientEncodingType,
       extraData,
       gated,
+      accessControlConditions,
     } = options || {}
     const dataLocation = attestation.dataLocation || DataLocationOnChain.ONCHAIN
     let attestationData
@@ -361,7 +359,10 @@ export class OnChainClient implements SignProtocolClientBase {
         const litprotocol = new LitProtocol(this.wallet)
         await litprotocol.connect()
         const { encryptedString: encryptedData, stringHash } =
-          await litprotocol.encrypt(uint8arrayFromString(JSON.stringify(data)))
+          await litprotocol.encrypt(
+            uint8arrayFromString(JSON.stringify(data)),
+            accessControlConditions
+          )
         encodedData = encodeOnChainEncryptedData(encryptedData, stringHash)
       } else {
         encodedData = encodeOnChainData(

@@ -3,6 +3,7 @@ import { EvmChains } from "../clients/evm/types.js"
 import { OffChainRpc } from "./offChain.js"
 import { WalletClient } from "viem"
 import { AbiType } from "abitype"
+import { AccsOperatorParams, AccsParams } from "@lit-protocol/types"
 export * from "./indexService.js"
 
 export type ContractInfo = {
@@ -198,6 +199,7 @@ export type CreateAttestationOnChainOptions = {
   recipientEncodingType?: RecipientEncodingType
   extraData?: `0x${string}`
   gated?: boolean
+  accessControlConditions?: (AccsParams | AccsOperatorParams)[]
 }
 
 export type GetAttestationChainOptions = {
