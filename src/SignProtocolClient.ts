@@ -1,6 +1,6 @@
-import { getClient } from './clients';
+import { getClient } from "./clients"
 
-import { SignProtocolClientBase } from './interface/SignProtocolClientBase';
+import { SignProtocolClientBase } from "./interface/SignProtocolClientBase"
 import {
   Attestation,
   AttestationResult,
@@ -10,75 +10,67 @@ import {
   OffChainClientOptions,
   RevokeAttestationResult,
   SchemaResult,
-  RecipientEncodingType,
   CreateAttestationOnChainOptions,
-} from './types';
+  RevokeAttestationOnChainOptions,
+} from "./types"
 export class SignProtocolClient implements SignProtocolClientBase {
-  public client: SignProtocolClientBase;
+  public client: SignProtocolClientBase
 
-  constructor(mode: SpMode.OnChain, options: OnChainClientOptions);
-  constructor(mode: SpMode.OffChain, options: OffChainClientOptions);
+  constructor(mode: SpMode.OnChain, options: OnChainClientOptions)
+  constructor(mode: SpMode.OffChain, options: OffChainClientOptions)
   constructor(
     mode: SpMode,
     options: OnChainClientOptions | OffChainClientOptions
   ) {
-    this.client = getClient(mode, options);
+    this.client = getClient(mode, options)
   }
 
   getClient(): SignProtocolClientBase {
-    return this.client;
+    return this.client
   }
-  async createSchema(schema: Schema): Promise<SchemaResult>;
+  async createSchema(schema: Schema): Promise<SchemaResult>
   async createSchema(
     schema: Schema,
     options?: { getTxHash?: (txHash: `0x${string}`) => void }
-  ): Promise<SchemaResult>;
+  ): Promise<SchemaResult>
   async createSchema(
     schema: Schema,
     options?: { getTxHash?: (txHash: `0x${string}`) => void }
   ): Promise<SchemaResult> {
-    return this.client.createSchema(schema, options);
+    return this.client.createSchema(schema, options)
   }
   async getSchema(schemaId: string): Promise<Schema> {
-    return this.client.getSchema(schemaId);
+    return this.client.getSchema(schemaId)
   }
-  async createAttestation(attestation: Attestation): Promise<AttestationResult>;
+  async createAttestation(attestation: Attestation): Promise<AttestationResult>
   async createAttestation(
     attestation: Attestation,
     options?: CreateAttestationOnChainOptions
-  ): Promise<AttestationResult>;
+  ): Promise<AttestationResult>
   async createAttestation(
     attestation: Attestation,
     options?: CreateAttestationOnChainOptions
   ): Promise<AttestationResult> {
-    return this.client.createAttestation(attestation, options);
+    return this.client.createAttestation(attestation, options)
   }
   async getAttestation(attestationId: string): Promise<Attestation> {
-    return this.client.getAttestation(attestationId);
+    return this.client.getAttestation(attestationId)
   }
 
   async revokeAttestation(
     attestationId: string,
     options?: {
-      reason?: string;
+      reason?: string
     }
-  ): Promise<RevokeAttestationResult>;
+  ): Promise<RevokeAttestationResult>
   async revokeAttestation(
     attestationId: string,
-    options?: {
-      reason?: string;
-      delegationSignature?: string;
-      getTxHash?: (txHash: `0x${string}`) => void;
-    }
-  ): Promise<RevokeAttestationResult>;
+    options?: RevokeAttestationOnChainOptions
+  ): Promise<RevokeAttestationResult>
   async revokeAttestation(
     attestationId: string,
-    options?: {
-      reason?: string;
-      delegationSignature?: string;
-      getTxHash?: (txHash: `0x${string}`) => void;
-    }
+    options?: RevokeAttestationOnChainOptions
   ): Promise<RevokeAttestationResult> {
-    return this.client.revokeAttestation(attestationId, options);
+    return this.client.revokeAttestation(attestationId, options)
   }
 }

@@ -3,40 +3,37 @@ import {
   AttestationResult,
   CreateAttestationOnChainOptions,
   RecipientEncodingType,
+  RevokeAttestationOnChainOptions,
   RevokeAttestationResult,
   Schema,
   SchemaResult,
-} from '../types';
+} from "../types"
 
 export interface SignProtocolClientBase {
-  createSchema(schema: Schema): Promise<SchemaResult>;
+  createSchema(schema: Schema): Promise<SchemaResult>
   createSchema(
     schema: Schema,
     options?: { getTxHash?: (txHash: `0x${string}`) => void }
-  ): Promise<SchemaResult>;
+  ): Promise<SchemaResult>
 
-  getSchema(schemaId: string): Promise<Schema>;
+  getSchema(schemaId: string): Promise<Schema>
 
-  createAttestation(attestation: Attestation): Promise<AttestationResult>;
+  createAttestation(attestation: Attestation): Promise<AttestationResult>
   createAttestation(
     attestation: Attestation,
     options?: CreateAttestationOnChainOptions
-  ): Promise<AttestationResult>;
+  ): Promise<AttestationResult>
 
-  getAttestation(attestationId: string): Promise<Attestation>;
+  getAttestation(attestationId: string): Promise<Attestation>
 
   revokeAttestation(
     attestationId: string,
     options?: {
-      reason?: string;
+      reason?: string
     }
-  ): Promise<RevokeAttestationResult>;
+  ): Promise<RevokeAttestationResult>
   revokeAttestation(
     attestationId: string,
-    options?: {
-      reason?: string;
-      delegationSignature?: string;
-      getTxHash?: (txHash: `0x${string}`) => void;
-    }
-  ): Promise<RevokeAttestationResult>;
+    options?: RevokeAttestationOnChainOptions
+  ): Promise<RevokeAttestationResult>
 }

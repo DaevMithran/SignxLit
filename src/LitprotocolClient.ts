@@ -13,22 +13,31 @@ import {
   LitAbility,
   UnifiedAccessControlConditions,
 } from "@lit-protocol/types"
-import { fromString, toString } from "uint8arrays"
+import {
+  uint8arrayFromString,
+  uint8arrayToString,
+} from "@lit-protocol/uint8arrays"
 import { ethers } from "ethers"
 
 export class LitProtocol {
   client: LitNodeClient | LitNodeClientNodeJs
   litNetwork: LitNetwork = LitNetwork.DatilDev
-  chain: string = "amoy"
+  chain: string = "ethereum"
   private readonly ethereumAuthWallet: ethers.Wallet
 
   constructor(ethereumAuthWallet: ethers.Wallet) {
     this.ethereumAuthWallet = ethereumAuthWallet
-    this.client = new LitNodeClientNodeJs({ litNetwork: this.litNetwork })
+    this.client = new LitNodeClientNodeJs({ litNetwork: LitNetwork.DatilDev })
   }
 
   async connect(): Promise<void> {
     return await this.client.connect()
+  }
+
+  static async create(ethereumWallet: ethers.Wallet): Promise<LitProtocol> {
+    const litProtocol = new LitProtocol(ethereumWallet)
+    await litProtocol.connect()
+    return litProtocol
   }
 
   async encrypt(
@@ -44,7 +53,7 @@ export class LitProtocol {
       })
 
     return {
-      encryptedString: fromString(encryptedString, "base64"),
+      encryptedString: uint8arrayFromString(encryptedString, "base64"),
       stringHash,
     }
   }
@@ -98,7 +107,7 @@ export class LitProtocol {
       sessionSigs,
     })
 
-    return toString(decryptedData, "utf-8")
+    return uint8arrayToString(decryptedData, "utf-8")
   }
 
   static generateAccessControlConditionBalance(

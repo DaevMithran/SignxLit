@@ -1,6 +1,6 @@
 {
-  "name": "@daevm/sp-sdk",
-  "version": "0.1.0",
+  "name": "@daevm/ethsign-sp-sdk",
+  "version": "0.7.7",
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.esm.js",
@@ -35,10 +35,9 @@
     "@lit-protocol/constants": "^6.11.1",
     "@lit-protocol/lit-node-client": "^6.11.1",
     "abitype": "^1.0.6",
-    "ethers": "^6.10.0",
     "query-string": "^9.0.0",
-    "tslib": "^2.6.2",
-    "viem": "^2.21.45"
+    "viem": "^2.21.45",
+    "tslib": "^2.6.2"
   },
   "publishConfig": {
     "access": "public"

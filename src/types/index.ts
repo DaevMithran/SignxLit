@@ -3,6 +3,7 @@ import { EvmChains } from "../clients/evm/types"
 import { OffChainRpc } from "./offChain"
 import { WalletClient } from "viem"
 import { AbiType } from "abitype"
+export * from "./indexService"
 
 export type ContractInfo = {
   address: Address
@@ -82,7 +83,7 @@ export type OnChainSchema =
        */
       resolver?: Address
       hook?: Address
-      registrant: Address
+      registrant?: Address
       timestamp?: number
       dataLocation?: DataLocationOnChain.ONCHAIN //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
       data: SchemaItem[] // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
@@ -90,7 +91,7 @@ export type OnChainSchema =
   | (CommonSchema & {
       resolver?: Address
       hook?: Address
-      registrant: Address
+      registrant?: Address
       dataLocation: DataLocationOnChain.ARWEAVE | DataLocationOnChain.IPFS //Where `Schema.data` is stored. See `DataLocation.DataLocation`.
       data: string // when dataLocation=ONCHAIN, data is SchemaItem[], when dataLocation=ARWEAVE or IPFS, data is id of the data,
     })
@@ -194,5 +195,13 @@ export type CreateAttestationOnChainOptions = {
   delegationSignature?: string
   getTxHash?: (txHash: `0x${string}`) => void
   recipientEncodingType?: RecipientEncodingType
+  extraData?: `0x${string}`
+  gated?: boolean
+}
+
+export type RevokeAttestationOnChainOptions = {
+  reason?: string
+  delegationSignature?: string
+  getTxHash?: (txHash: `0x${string}`) => void
   extraData?: `0x${string}`
 }
