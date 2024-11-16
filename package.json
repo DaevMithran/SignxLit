@@ -17,6 +17,7 @@
   "author": "tinystone007",
   "license": "ISC",
   "devDependencies": {
+    "@lit-protocol/types": "^6.11.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "react": "18",
@@ -30,6 +31,9 @@
     "vocs": "^1.0.0-alpha.29"
   },
   "dependencies": {
+    "@lit-protocol/auth-helpers": "^6.11.1",
+    "@lit-protocol/constants": "^6.11.1",
+    "@lit-protocol/lit-node-client": "^6.11.1",
     "abitype": "^1.0.6",
     "ethers": "^6.10.0",
     "query-string": "^9.0.0",
